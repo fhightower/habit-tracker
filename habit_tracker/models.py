@@ -10,14 +10,31 @@ class Habit(models.Model):
         return self.name
 
 
+class HabitCompletionStatus(models.TextChoices):
+    INCOMPLETE = "INCOMPLETE", "Incomplete"
+    COMPLETE = "COMPLETE", "Complete"
+    NA = "N/A", "N/A"
+
+
 class HabitCompletion(models.Model):
     habit = models.ForeignKey(
         Habit, on_delete=models.CASCADE, related_name="completions"
     )
     date = models.DateField()
+    status = models.CharField(
+        max_length=20,
+        choices=HabitCompletionStatus.choices,
+        default=HabitCompletionStatus.INCOMPLETE,
+    )
 
     class Meta:
         unique_together = ("habit", "date")
 
     def __str__(self):
-        return f"{self.habit.name} on {self.date}: ✔"
+        status_icon = "✘"
+        if self.status == HabitCompletionStatus.COMPLETE:
+            status_icon = "✔"
+        if self.status == HabitCompletionStatus.NA:
+            status_icon = "-"
+
+        return f"{self.habit.name} on {self.date}: {status_icon}"

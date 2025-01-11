@@ -18,8 +18,8 @@ urlpatterns = [
     ),
     path(
         "<int:year>/<int:month>/<int:day>/",
-        views.HabitCompletionDayArchiveView.as_view(month_format="%m"),
-        name="archive_day",
+        views.DayView.as_view(),
+        name="day_view",
     ),
-    path("", views.TodayView.as_view(), name="today"),
+    path("", views.redirect_to_today, name="base"),
 ]

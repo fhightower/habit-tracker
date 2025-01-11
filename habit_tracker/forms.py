@@ -1,23 +1,22 @@
-from datetime import date
+from datetime import date, timedelta
 from django import forms
 from .models import Habit
 
 
 class HabitCompletionForm(forms.Form):
-    # TODO: start here and sort by habit name
     habits = forms.ModelMultipleChoiceField(
-        queryset=Habit.objects.all(),
+        queryset=Habit.objects.all().order_by("name"),
         widget=forms.CheckboxSelectMultiple,
         label="",
     )
 
     def __init__(self, *args, **kwargs):
+        view_date = kwargs.pop('view_date', date.today())
         super().__init__(*args, **kwargs)
-        today = date.today()
 
-        # Get habits that have a completion record for today
         completed_habits = Habit.objects.filter(
-            completions__date=today,
+            completions__date=view_date,
+            completions__status="COMPLETE",
         )
 
         self.fields["habits"].initial = completed_habits

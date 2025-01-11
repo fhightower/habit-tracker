@@ -1,24 +1,21 @@
 from datetime import date
 from django.views.generic import (
     CreateView,
-    DayArchiveView,
     DeleteView,
     FormView,
     ListView,
     UpdateView,
 )
 from django.urls import reverse_lazy
+from django.shortcuts import redirect
 
 
-from .models import Habit, HabitCompletion
+from .models import Habit, HabitCompletion, HabitCompletionStatus
 from .forms import HabitCompletionForm
 
 
-# todo: create edit option for habits
-# todo: create delete option for habits
-
-
 class HabitListView(ListView):
+    # TODO: sort by alphabetical order
     model = Habit
     template_name = "habit_tracker/habit_list.html"
     context_object_name = "habits"
@@ -38,34 +35,49 @@ class HabitEditView(UpdateView):
     success_url = reverse_lazy("habit_tracker:habit_list")
 
 
+# TODO: block access to future dates
+
+
 class HabitDeleteView(DeleteView):
     model = Habit
     template_name = "habit_tracker/habit_delete.html"
     success_url = reverse_lazy("habit_tracker:habit_list")
 
 
-class HabitCompletionDayArchiveView(DayArchiveView):
-    queryset = HabitCompletion.objects.all()
-    date_field = "date"
-    allow_future = True
-
-
-class TodayView(FormView):
-    template_name = "habit_tracker/today.html"
+class DayView(FormView):
+    template_name = "habit_tracker/day.html"
     form_class = HabitCompletionForm
-    success_url = reverse_lazy("habit_tracker:today")
+
+    def get_success_url(self):
+        return self.request.path
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["view_date"] = self.view_date
+        return kwargs
+
+    def dispatch(self, request, *args, **kwargs):
+        self.view_date = date(kwargs["year"], kwargs["month"], kwargs["day"])
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         completed_habits = form.cleaned_data["habits"]
-        today = date.today()
 
-        todays_habit_completions = HabitCompletion.objects.filter(date=today)
+        for habit in Habit.objects.all():
+            status = HabitCompletionStatus.INCOMPLETE
 
-        for habit_completion in todays_habit_completions:
-            if habit_completion.habit not in completed_habits:
-                habit_completion.delete()
+            if habit in completed_habits:
+                status = HabitCompletionStatus.COMPLETE
 
-        for habit in completed_habits:
-            HabitCompletion.objects.update_or_create(habit=habit, date=today)
+            HabitCompletion.objects.update_or_create(
+                habit=habit, date=self.view_date, defaults={"status": status}
+            )
 
         return super().form_valid(form)
+
+
+def redirect_to_today(request):
+    today = date.today()
+    return redirect(
+        "habit_tracker:day_view", year=today.year, month=today.month, day=today.day
+    )
