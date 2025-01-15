@@ -1,9 +1,11 @@
 {% block content %}
-  <h2>Make today count...</h2>
-  todo: pass date into this view
+  <h2>{{ view_date}}... make today count!</h2>
+
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Submit</button>
   </form>
+
+  {{ completion_percent }}% of habits completed today
 {% endblock %}

@@ -1,0 +1,42 @@
+{% block content %}
+  <h2>Habit Completions Heatmap</h2>
+  <div class="heatmap">
+    {% for week in weeks %}
+      <div class="week">
+        {% for day in week %}
+          <div
+            class="day"
+            style="background-color: rgba(34, 139, 34, {{ day.completion_percent_float }});"
+            title="Date: {{ day.date }} | Completions: {{ day.completion_percent_human_readable }}%">
+          </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <style>
+    .heatmap {
+      display: flex;
+      flex-direction: row;
+      gap: 4px;
+    }
+
+    .week {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .day {
+      width: 20px;
+      height: 20px;
+      border: 1px solid #ddd; /* Optional border */
+      background-color: rgba(34, 139, 34, 0); /* Default: no completions */
+      transition: background-color 0.3s;
+    }
+
+    .day:hover {
+      border-color: #000; /* Highlight on hover */
+    }
+  </style>
+{% endblock %}

@@ -12,14 +12,14 @@ urlpatterns = [
     path("habits/<int:pk>/", views.HabitEditView.as_view(), name="habit_edit"),
     path('habits/<int:pk>/delete/', views.HabitDeleteView.as_view(), name='habit_delete'),
     path(
-        "archive/",
-        ArchiveIndexView.as_view(model=HabitCompletion, date_field="date"),
-        name="archive",
-    ),
-    path(
         "<int:year>/<int:month>/<int:day>/",
         views.DayView.as_view(),
         name="day_view",
     ),
-    path("", views.redirect_to_today, name="base"),
+    path(
+        "today",
+        views.redirect_today,
+        name="redirect_today",
+    ),
+    path("", views.heatmap_view, name="heatmap"),
 ]
