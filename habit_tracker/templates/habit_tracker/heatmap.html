@@ -14,11 +14,14 @@
     {% endfor %}
   </div>
 
+  <a href="{% url 'habit_tracker:redirect_today' %}" id="todayLink">Today</a>
+
   <style>
     .heatmap {
       display: flex;
       flex-direction: row;
       gap: 4px;
+      margin-bottom: 3em;
     }
 
     .week {
@@ -37,6 +40,11 @@
 
     .day:hover {
       border-color: #000; /* Highlight on hover */
+    }
+
+    #todayLink {
+      margin-right: 2em;
+      float: right;
     }
   </style>
 {% endblock %}

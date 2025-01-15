@@ -7,5 +7,9 @@
     <button type="submit">Submit</button>
   </form>
 
-  {{ completion_percent }}% of habits completed today
+  <p>{{ completion_percent }}% of habits completed today</p>
+
+  <br>
+
+  <a href="{% url 'habit_tracker:heatmap' %}">Heatmap</a>
 {% endblock %}
