@@ -6,7 +6,7 @@
         {% for day in week %}
           <div
             class="day"
-            style="background-color: rgba(34, 139, 34, {{ day.completion_percent_float }});"
+            style="background-color: rgba(34, 139, 34, {{ day.opacity }});"
             title="Date: {{ day.date }} | Completions: {{ day.completion_percent_human_readable }}%">
           </div>
         {% endfor %}

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Django App</title>
+</head>
+<body>
+    {% block content %}
+    {% endblock %}
+
+    <ul>
+          <li><a href="{% url 'habit_tracker:heatmap' %}">Heatmap</a></li>
+          <li><a href="{% url 'habit_tracker:habit_list' %}">Habits</a></li>
+          <li><a href="{% url 'habit_tracker:redirect_today' %}">Today</a></li>
+    </ul>
+</body>
+</html>

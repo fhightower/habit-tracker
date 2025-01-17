@@ -96,6 +96,7 @@ class HeatmapData:
     date: date
     completion_percent_float: float
     completion_percent_human_readable: int
+    opacity: float
 
 
 def _find_completion_percent(completions) -> float:
@@ -107,6 +108,10 @@ def _find_completion_percent(completions) -> float:
     )
     total_habits = len(completions)
     return completed_habits / total_habits
+
+
+def _find_opacity(completion_percent: float) -> float:
+    return completion_percent * completion_percent
 
 
 def heatmap_view(request):
@@ -123,6 +128,7 @@ def heatmap_view(request):
             date=past,
             completion_percent_float=completion_percent,
             completion_percent_human_readable=round(completion_percent * 100),
+            opacity=_find_opacity(completion_percent),
         )
         data.append(day_heatmap_data)
         past += timedelta(days=1)
