@@ -1,3 +1,5 @@
+{% extends "base.html" %}
+
 {% block content %}
   <h2>Habit Completions Heatmap</h2>
   <div class="heatmap">
@@ -13,8 +15,6 @@
       </div>
     {% endfor %}
   </div>
-
-  <a href="{% url 'habit_tracker:redirect_today' %}" id="todayLink">Today</a>
 
   <style>
     .heatmap {
@@ -42,7 +42,7 @@
       border-color: #000; /* Highlight on hover */
     }
 
-    #todayLink {
+    #baseNav {
       margin-right: 2em;
       float: right;
     }

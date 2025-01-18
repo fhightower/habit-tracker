@@ -111,27 +111,32 @@ def _find_completion_percent(completions) -> float:
 
 
 def _find_opacity(completion_percent: float) -> float:
-    return completion_percent * completion_percent
+    if completion_percent == 0:
+        return 0.0
+
+    # Add a min. opacity so that the heatmap is not completely transparent for days with very few completions
+    return max(completion_percent * completion_percent, 0.1)
 
 
 def heatmap_view(request):
     today = date.today()
-    past = today - timedelta(days=365)
+    date_to_process = today - timedelta(days=365)
+    # Find the Sunday before the day 365 days ago
+    while date_to_process.weekday() != 6:
+        date_to_process -= timedelta(days=1)
     data = []
 
-    # TODO: improve display so Sunday is always the first day of the week
-
-    while past <= today:
-        completions = HabitCompletion.objects.filter(date=past)
+    while date_to_process <= today:
+        completions = HabitCompletion.objects.filter(date=date_to_process)
         completion_percent = _find_completion_percent(completions)
         day_heatmap_data = HeatmapData(
-            date=past,
+            date=date_to_process,
             completion_percent_float=completion_percent,
             completion_percent_human_readable=round(completion_percent * 100),
             opacity=_find_opacity(completion_percent),
         )
         data.append(day_heatmap_data)
-        past += timedelta(days=1)
+        date_to_process += timedelta(days=1)
 
     weeks = []
     for i in range(0, len(data), 7):

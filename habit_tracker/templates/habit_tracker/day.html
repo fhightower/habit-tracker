@@ -1,3 +1,5 @@
+{% extends "base.html" %}
+
 {% block content %}
   <h2>{{ view_date}}... make today count!</h2>
 
@@ -8,12 +10,4 @@
   </form>
 
   <p>{{ completion_percent }}% of habits completed today</p>
-
-  <br>
-
-  <a href="{% url 'habit_tracker:heatmap' %}">Heatmap</a>
-  <br>
-  <a href="{% url 'habit_tracker:habit_list' %}">Habits</a>
-  <br>
-  <a href="{% url 'habit_tracker:redirect_today' %}">Today</a>
 {% endblock %}
