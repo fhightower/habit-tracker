@@ -5,16 +5,11 @@ from datetime import timedelta
 from django.views.generic import (
     CreateView,
     DeleteView,
-    FormView,
     ListView,
     UpdateView,
 )
 from django.urls import reverse_lazy
 from django.shortcuts import redirect, render
-
-from habit_tracker.utils import get_todays_completion_percent
-
-
 from .models import Habit, HabitCompletion, HabitCompletionStatus
 from .forms import HabitCompletionForm
 
@@ -46,48 +41,39 @@ class HabitDeleteView(DeleteView):
     success_url = reverse_lazy("habit_tracker:habit_list")
 
 
-class DayView(FormView):
-    template_name = "habit_tracker/day.html"
-    form_class = HabitCompletionForm
+def day_view(request, year, month, day):
+    view_date = date(year, month, day)
 
-    def get_success_url(self):
-        return self.request.path
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["view_date"] = self.view_date
-        return kwargs
-
-    def dispatch(self, request, *args, **kwargs):
-        self.view_date = date(kwargs["year"], kwargs["month"], kwargs["day"])
-
-        if self.view_date > date.today():
+    if request.method == "POST":
+        form = HabitCompletionForm(request.POST)
+        if form.is_valid():
+            for habit in Habit.objects.all():
+                field_name = f"habit_{habit.id}"
+                status = form.cleaned_data.get(field_name)
+                if status:
+                    HabitCompletion.objects.update_or_create(
+                        habit=habit,
+                        date=view_date,
+                        defaults={"status": status},
+                    )
+            return redirect("habit_tracker:day_view", year=year, month=month, day=day)
+    else:
+        if view_date > date.today():
             return HttpResponseForbidden("Access to future dates is not allowed.")
 
-        return super().dispatch(request, *args, **kwargs)
+        initial_data = {}
+        completions = HabitCompletion.objects.filter(date=view_date)
+        for completion in completions:
+            initial_data[f"habit_{completion.habit.id}"] = completion.status
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["view_date"] = self.view_date
-        context["completion_percent"] = round(
-            get_todays_completion_percent(self.view_date) * 100
-        )
-        return context
+        form = HabitCompletionForm(initial=initial_data)
+        context = {
+            "form": form,
+            "view_date": view_date,
+            "completion_percent": round(_find_completion_percent(completions) * 100),
+        }
 
-    def form_valid(self, form):
-        completed_habits = form.cleaned_data["habits"]
-
-        for habit in Habit.objects.all():
-            status = HabitCompletionStatus.INCOMPLETE
-
-            if habit in completed_habits:
-                status = HabitCompletionStatus.COMPLETE
-
-            HabitCompletion.objects.update_or_create(
-                habit=habit, date=self.view_date, defaults={"status": status}
-            )
-
-        return super().form_valid(form)
+    return render(request, "habit_tracker/day.html", context)
 
 
 @dataclass
@@ -102,11 +88,19 @@ def _find_completion_percent(completions) -> float:
     if not completions:
         return 0.0
 
-    completed_habits = len(
-        [c for c in completions if c.status == HabitCompletionStatus.COMPLETE]
-    )
-    total_habits = len(completions)
-    return completed_habits / total_habits
+    total_completable_habits = 0
+    total_completed_habits = 0
+
+    for completion in completions:
+        if completion.status != HabitCompletionStatus.NA:
+            total_completable_habits += 1
+            if completion.status == HabitCompletionStatus.COMPLETE:
+                total_completed_habits += 1
+
+    if total_completable_habits == 0:
+        return 0.0
+
+    return total_completed_habits / total_completable_habits
 
 
 def _find_opacity(completion_percent: float) -> float:

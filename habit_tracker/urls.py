@@ -13,7 +13,7 @@ urlpatterns = [
     path('habits/<int:pk>/delete/', views.HabitDeleteView.as_view(), name='habit_delete'),
     path(
         "<int:year>/<int:month>/<int:day>/",
-        views.DayView.as_view(),
+        views.day_view,
         name="day_view",
     ),
     path(

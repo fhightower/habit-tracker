@@ -5,8 +5,15 @@
 
   <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
+    <table>
+      {% for field in form %}
+        <tr>
+          <td>{{ field.label }}</td>
+          <td>{{ field }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+    <button type="submit">Save</button>
   </form>
 
   <p>{{ completion_percent }}% of habits completed today</p>
