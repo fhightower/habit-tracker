@@ -68,7 +68,6 @@ class DayView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # TODO: For each habit, pull how many consecutive days it has been completed
         context["view_date"] = self.view_date
         context["completion_percent"] = round(
             get_todays_completion_percent(self.view_date) * 100

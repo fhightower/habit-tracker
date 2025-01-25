@@ -6,11 +6,13 @@
     {% for week in weeks %}
       <div class="week">
         {% for day in week %}
-          <div
-            class="day"
-            style="background-color: rgba(34, 139, 34, {{ day.opacity }});"
-            title="Date: {{ day.date }} | Completions: {{ day.completion_percent_human_readable }}%">
-          </div>
+          <a href="{% url 'habit_tracker:day_view' day.date.year day.date.month day.date.day %}">
+            <div
+              class="day"
+              style="background-color: rgba(34, 139, 34, {{ day.opacity }});"
+              title="Date: {{ day.date }} | Completions: {{ day.completion_percent_human_readable }}%">
+            </div>
+          </a>
         {% endfor %}
       </div>
     {% endfor %}
