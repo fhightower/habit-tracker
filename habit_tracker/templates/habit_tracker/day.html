@@ -8,8 +8,8 @@
     <table>
       {% for field in form %}
         <tr>
-          <td>{{ field.label }}</td>
           <td>{{ field }}</td>
+          <td>{{ field.label }}</td>
         </tr>
       {% endfor %}
     </table>
@@ -17,4 +17,38 @@
   </form>
 
   <p>{{ completion_percent }}% of habits completed today</p>
+
+  <style>
+    .completed {
+      background-color: lightgreen;
+    }
+    .incomplete {
+      color: red;
+      background-color: lightpink;
+    }
+    .na {
+      color: grey;
+      background-color: lightgrey;
+    }
+  </style>
+
+  <script>
+    function updateSelectStyles(select) {
+      select.classList.remove('completed', 'incomplete', 'na');
+
+      if (select.value === 'COMPLETE') {
+        select.classList.add('completed');
+      } else if (select.value === 'N/A') {
+        select.classList.add('na');
+      } else if (select.value === 'INCOMPLETE') {
+        select.classList.add('incomplete');
+      }
+    }
+
+    document.querySelectorAll('select').forEach((select) => {
+      updateSelectStyles(select);
+
+      select.addEventListener('change', () => updateSelectStyles(select));
+    });
+  </script>
 {% endblock %}

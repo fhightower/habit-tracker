@@ -3,7 +3,7 @@
 {% block content %}
   <h2>Habit Completions Heatmap</h2>
   <div class="heatmap">
-    {% for week in weeks %}
+    {% for week, stats in week_data %}
       <div class="week">
         {% for day in week %}
           <a href="{% url 'habit_tracker:day_view' day.date.year day.date.month day.date.day %}">
@@ -14,6 +14,9 @@
             </div>
           </a>
         {% endfor %}
+        <div class="weekStats">
+          {{ stats.avg }}
+        </div>
       </div>
     {% endfor %}
   </div>
@@ -42,6 +45,14 @@
 
     .day:hover {
       border-color: #000; /* Highlight on hover */
+    }
+
+    .weekStats {
+      width: 20px;
+      height: 20px;
+      border: 1px solid #ddd; /* Optional border */
+      background-color: rgba(34, 139, 34, 0); /* Default: no completions */
+      transition: background-color 0.3s;
     }
 
     #baseNav {

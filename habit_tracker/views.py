@@ -10,6 +10,7 @@ from django.views.generic import (
 )
 from django.urls import reverse_lazy
 from django.shortcuts import redirect, render
+from habit_tracker.utils import get_habits_for_date
 from .models import Habit, HabitCompletion, HabitCompletionStatus
 from .forms import HabitCompletionForm
 
@@ -23,14 +24,14 @@ class HabitListView(ListView):
 
 class HabitCreateView(CreateView):
     model = Habit
-    fields = ["name", "description"]
+    fields = ["name", "description", "start_date", "end_date"]
     template_name = "habit_tracker/habit_create.html"
     success_url = reverse_lazy("habit_tracker:habit_list")
 
 
 class HabitEditView(UpdateView):
     model = Habit
-    fields = ["name", "description"]
+    fields = ["name", "description", "start_date", "end_date"]
     template_name = "habit_tracker/habit_edit.html"
     success_url = reverse_lazy("habit_tracker:habit_list")
 
@@ -45,9 +46,9 @@ def day_view(request, year, month, day):
     view_date = date(year, month, day)
 
     if request.method == "POST":
-        form = HabitCompletionForm(request.POST)
+        form = HabitCompletionForm(request.POST, view_date=view_date)
         if form.is_valid():
-            for habit in Habit.objects.all():
+            for habit in get_habits_for_date(view_date):
                 field_name = f"habit_{habit.id}"
                 status = form.cleaned_data.get(field_name)
                 if status:
@@ -66,7 +67,7 @@ def day_view(request, year, month, day):
         for completion in completions:
             initial_data[f"habit_{completion.habit.id}"] = completion.status
 
-        form = HabitCompletionForm(initial=initial_data)
+        form = HabitCompletionForm(initial=initial_data, view_date=view_date)
         context = {
             "form": form,
             "view_date": view_date,
@@ -118,6 +119,7 @@ def heatmap_view(request):
     while date_to_process.weekday() != 6:
         date_to_process -= timedelta(days=1)
     data = []
+    week_stats = []
 
     while date_to_process <= today:
         completions = HabitCompletion.objects.filter(date=date_to_process)
@@ -135,8 +137,15 @@ def heatmap_view(request):
     for i in range(0, len(data), 7):
         week = data[i : i + 7]
         weeks.append(week)
+        week_stats.append(
+            {
+                "avg": round(
+                    sum(day.completion_percent_float for day in week) / 7 * 100
+                ),
+            }
+            )
 
-    return render(request, "habit_tracker/heatmap.html", {"weeks": weeks})
+    return render(request, "habit_tracker/heatmap.html", {"week_data": zip(weeks, week_stats)})
 
 
 def redirect_today(request):
