@@ -5,14 +5,13 @@ class Habit(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    # Add date fields for start and end dates
     start_date = models.DateField()
     end_date = models.DateField(null=True, blank=True)
 
     class Meta:
         unique_together = ("name", "start_date", "end_date")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 

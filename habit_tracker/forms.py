@@ -1,7 +1,6 @@
 from datetime import date
 from django import forms
 from habit_tracker.utils import get_habits_for_date
-from .models import Habit
 from .models import HabitCompletionStatus
 
 
@@ -17,4 +16,3 @@ class HabitCompletionForm(forms.Form):
                 label=habit.name,
                 required=False,
             )
-

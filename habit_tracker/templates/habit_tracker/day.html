@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>{{ view_date}}... make today count!</h2>
+  <h2>{{ view_date}} {% if is_today %}(today){% endif %}</h2>
 
   <form method="post">
     {% csrf_token %}

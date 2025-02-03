@@ -68,13 +68,15 @@ def day_view(request, year, month, day):
             initial_data[f"habit_{completion.habit.id}"] = completion.status
 
         form = HabitCompletionForm(initial=initial_data, view_date=view_date)
+        is_today = view_date == date.today()
+
         context = {
             "form": form,
             "view_date": view_date,
             "completion_percent": round(_find_completion_percent(completions) * 100),
+            "is_today": is_today,
         }
-
-    return render(request, "habit_tracker/day.html", context)
+        return render(request, "habit_tracker/day.html", context)
 
 
 @dataclass
@@ -143,9 +145,11 @@ def heatmap_view(request):
                     sum(day.completion_percent_float for day in week) / 7 * 100
                 ),
             }
-            )
+        )
 
-    return render(request, "habit_tracker/heatmap.html", {"week_data": zip(weeks, week_stats)})
+    return render(
+        request, "habit_tracker/heatmap.html", {"week_data": zip(weeks, week_stats)}
+    )
 
 
 def redirect_today(request):
