@@ -44,9 +44,10 @@ class HabitDeleteView(DeleteView):
 
 def day_view(request, year, month, day):
     view_date = date(year, month, day)
+    is_today = view_date == date.today()
 
     if request.method == "POST":
-        form = HabitCompletionForm(request.POST, view_date=view_date)
+        form = HabitCompletionForm(request.POST, view_date=view_date, is_today=is_today)
         if form.is_valid():
             for habit in get_habits_for_date(view_date):
                 field_name = f"habit_{habit.id}"
@@ -67,8 +68,7 @@ def day_view(request, year, month, day):
         for completion in completions:
             initial_data[f"habit_{completion.habit.id}"] = completion.status
 
-        form = HabitCompletionForm(initial=initial_data, view_date=view_date)
-        is_today = view_date == date.today()
+        form = HabitCompletionForm(initial=initial_data, view_date=view_date, is_today=is_today)
 
         context = {
             "form": form,
