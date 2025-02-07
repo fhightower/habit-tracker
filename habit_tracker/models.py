@@ -63,6 +63,14 @@ class Habit(models.Model):
             streak = (yesterday - last_completion_date).days
             return -(streak + na_completions)
 
+    @property
+    def completion_percentage(self) -> int:
+        all_completions = self.completions.filter(status__in=["COMPLETE", "INCOMPLETE"])
+        if not all_completions:
+            return 0
+        completed = all_completions.filter(status="COMPLETE").count()
+        return round(completed / all_completions.count() * 100)
+
     class Meta:
         unique_together = ("name", "start_date", "end_date")
 
