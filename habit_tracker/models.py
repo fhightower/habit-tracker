@@ -2,9 +2,6 @@ from datetime import date, timedelta
 
 from django.db import models
 
-today = date.today()
-yesterday = today - timedelta(days=1)
-
 
 class Habit(models.Model):
     name = models.CharField(max_length=255)
@@ -15,17 +12,31 @@ class Habit(models.Model):
 
     @property
     def streak(self) -> int:
-        last_miss = self.completions.filter(status="INCOMPLETE", date__lt=today).order_by("date").last()
-        last_completion = self.completions.filter(status="COMPLETE").order_by("date").last()
+        today = date.today()
+        yesterday = today - timedelta(days=1)
+
+        last_miss = (
+            self.completions.filter(status="INCOMPLETE", date__lt=today)
+            .order_by("date")
+            .last()
+        )
+        last_completion = (
+            self.completions.filter(status="COMPLETE").order_by("date").last()
+        )
 
         # TODO: clean up this function...
 
         if not last_miss:
-            na_completions = self.completions.filter(date__range=(self.start_date, today), status=HabitCompletionStatus.NA).count()
+            na_completions = self.completions.filter(
+                date__range=(self.start_date, today), status=HabitCompletionStatus.NA
+            ).count()
             # We +1 b/c you may have gotten it on the start date
             streak = (today - self.start_date).days + 1 - na_completions
             today_completion = self.completions.filter(date=today, habit=self).first()
-            if today_completion and today_completion.status == HabitCompletionStatus.INCOMPLETE:
+            if (
+                today_completion
+                and today_completion.status == HabitCompletionStatus.INCOMPLETE
+            ):
                 streak -= 1
             return streak
 
@@ -33,14 +44,22 @@ class Habit(models.Model):
         last_completion_date = last_completion.date if last_completion else date.min
 
         if last_completion_date > last_miss_date:
-            na_completions = self.completions.filter(date__range=(last_miss_date, today), status=HabitCompletionStatus.NA).count()
+            na_completions = self.completions.filter(
+                date__range=(last_miss_date, today), status=HabitCompletionStatus.NA
+            ).count()
             streak = (today - last_miss_date).days
             today_completion = self.completions.filter(date=today, habit=self).first()
-            if today_completion and today_completion.status == HabitCompletionStatus.INCOMPLETE:
+            if (
+                today_completion
+                and today_completion.status == HabitCompletionStatus.INCOMPLETE
+            ):
                 streak -= 1
-            return (streak - na_completions)
+            return streak - na_completions
         else:
-            na_completions = self.completions.filter(date__range=(last_completion_date, today), status=HabitCompletionStatus.NA).count()
+            na_completions = self.completions.filter(
+                date__range=(last_completion_date, today),
+                status=HabitCompletionStatus.NA,
+            ).count()
             streak = (yesterday - last_completion_date).days
             return -(streak + na_completions)
 
