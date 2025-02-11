@@ -7,10 +7,14 @@
     {% csrf_token %}
     <table>
       {% for field in form %}
-        <tr>
-          <td>{{ field }}</td>
-          <td>{{ field.label }}</td>
-        </tr>
+          <tr>
+            <td>{{ field }}</td>
+            <td>
+                <details>
+                    <summary>{{ field.label }}</summary>
+                    <textarea name="note_{{ field.name }}" rows="4" cols="50">{{ field.note }}</textarea>
+                </details></td>
+         </tr>
       {% endfor %}
     </table>
     <button type="submit">Save</button>

@@ -51,12 +51,15 @@ def day_view(request, year, month, day):
         if form.is_valid():
             for habit in get_habits_for_date(view_date):
                 field_name = f"habit_{habit.id}"
+                note_name = f"note_habit_{habit.id}"
+
                 status = form.cleaned_data.get(field_name)
                 if status:
+                    note = request.POST.get(note_name) or None
                     HabitCompletion.objects.update_or_create(
                         habit=habit,
                         date=view_date,
-                        defaults={"status": status},
+                        defaults={"status": status, "note": note},
                     )
             return redirect("habit_tracker:day_view", year=year, month=month, day=day)
     else:
@@ -67,8 +70,11 @@ def day_view(request, year, month, day):
         completions = HabitCompletion.objects.filter(date=view_date)
         for completion in completions:
             initial_data[f"habit_{completion.habit.id}"] = completion.status
+            initial_data[f"note_habit_{completion.habit.id}"] = completion.note
 
-        form = HabitCompletionForm(initial=initial_data, view_date=view_date, is_today=is_today)
+        form = HabitCompletionForm(
+            initial=initial_data, view_date=view_date, is_today=is_today
+        )
 
         context = {
             "form": form,

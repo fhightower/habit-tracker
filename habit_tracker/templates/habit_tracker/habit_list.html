@@ -4,7 +4,7 @@
   <h1>Habit List</h1>
   <ul>
     {% for habit in habits %}
-    <li><a href="{% url 'habit_tracker:habit_edit' habit.id %}">{{ habit.name }}</a> ({{ habit.completion_percentage }}% completion rate)</li>
+    <li><a href="{% url 'habit_tracker:habit_edit' habit.id %}">{{ habit.name }}</a> ({{ habit.completion_percentage }}%)</li>
     {% endfor %}
   </ul>
 

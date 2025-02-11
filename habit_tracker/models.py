@@ -94,6 +94,7 @@ class HabitCompletion(models.Model):
         choices=HabitCompletionStatus.choices,
         default=HabitCompletionStatus.INCOMPLETE,
     )
+    note = models.TextField(blank=True, null=True)
 
     class Meta:
         unique_together = ("habit", "date")
