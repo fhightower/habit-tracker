@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import date
+from django.utils import timezone
 from django.http import HttpResponseForbidden
 from datetime import timedelta
 from django.views.generic import (
@@ -44,7 +45,8 @@ class HabitDeleteView(DeleteView):
 
 def day_view(request, year, month, day):
     view_date = date(year, month, day)
-    is_today = view_date == date.today()
+    today = timezone.now().date()
+    is_today = view_date == today
 
     if request.method == "POST":
         form = HabitCompletionForm(request.POST, view_date=view_date, is_today=is_today)
@@ -63,7 +65,7 @@ def day_view(request, year, month, day):
                     )
             return redirect("habit_tracker:day_view", year=year, month=month, day=day)
     else:
-        if view_date > date.today():
+        if view_date > today:
             return HttpResponseForbidden("Access to future dates is not allowed.")
 
         initial_data = {}
@@ -121,7 +123,7 @@ def _find_opacity(completion_percent: float) -> float:
 
 
 def heatmap_view(request):
-    today = date.today()
+    today = timezone.now().date()
     date_to_process = today - timedelta(days=365)
     # Find the Sunday before the day 365 days ago
     while date_to_process.weekday() != 6:
@@ -159,7 +161,7 @@ def heatmap_view(request):
 
 
 def redirect_today(request):
-    today = date.today()
+    today = timezone.now().date()
     return redirect(
         "habit_tracker:day_view", year=today.year, month=today.month, day=today.day
     )
