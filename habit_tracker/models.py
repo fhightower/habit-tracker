@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 from django.db import models
+from django.utils import timezone
 
 
 class Habit(models.Model):
@@ -70,6 +71,10 @@ class Habit(models.Model):
             return 0
         completed = all_completions.filter(status="COMPLETE").count()
         return round(completed / all_completions.count() * 100)
+
+    @property
+    def is_active(self) -> bool:
+        return self.end_date == None or self.end_date > timezone.now().date()
 
     class Meta:
         unique_together = ("name", "start_date", "end_date")

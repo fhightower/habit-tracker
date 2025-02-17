@@ -2,9 +2,22 @@
 
 {% block content %}
   <h1>Habit List</h1>
+
+  <h2>Active Habits</h2>
   <ul>
     {% for habit in habits %}
-    <li><a href="{% url 'habit_tracker:habit_edit' habit.id %}">{{ habit.name }}</a> ({{ habit.completion_percentage }}%)</li>
+        {% if habit.is_active %}
+            <li><a href="{% url 'habit_tracker:habit_edit' habit.id %}">{{ habit.name }}</a> ({{ habit.completion_percentage }}%)</li>
+        {% endif %}
+    {% endfor %}
+  </ul>
+
+  <h2>Inactive Habits</h2>
+  <ul>
+    {% for habit in habits %}
+        {% if not habit.is_active %}
+            <li><a href="{% url 'habit_tracker:habit_edit' habit.id %}">{{ habit.name }}</a> ({{ habit.completion_percentage }}%)</li>
+        {% endif %}
     {% endfor %}
   </ul>
 
