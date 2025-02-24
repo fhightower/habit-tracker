@@ -24,7 +24,11 @@ class HabitCompletionForm(forms.Form):
         for habit in get_habits_for_date(view_date):
             label = habit.name
             if is_today:
-                label += f" (streak: {habit.streak})"
+                streak = habit.streak
+                streak_addition = f"<span style='color: red'> ({streak})</span>"
+                if streak > 0:
+                    streak_addition = f"<span style='color: green'> ({streak})</span>"
+                label += streak_addition
             self.fields[f"habit_{habit.id}"] = CustomChoiceField(
                 choices=HabitCompletionStatus.choices,
                 widget=forms.Select,

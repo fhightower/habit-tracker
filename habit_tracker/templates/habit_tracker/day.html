@@ -11,7 +11,7 @@
             <td>{{ field }}</td>
             <td>
                 <details>
-                    <summary>{{ field.label }}</summary>
+                    <summary>{{ field.label | safe }}</summary>
                     <textarea name="note_{{ field.name }}" rows="4" cols="50">{{ field.note }}</textarea>
                 </details></td>
          </tr>
