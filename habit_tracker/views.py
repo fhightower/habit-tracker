@@ -150,7 +150,7 @@ def heatmap_view(request):
         week_stats.append(
             {
                 "avg": round(
-                    sum(day.completion_percent_float for day in week) / 7 * 100
+                    sum(day.completion_percent_float for day in week) / len(week) * 100
                 ),
             }
         )

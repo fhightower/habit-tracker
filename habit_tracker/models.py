@@ -48,13 +48,14 @@ class Habit(models.Model):
             na_completions = self.completions.filter(
                 date__range=(last_miss_date, today), status=HabitCompletionStatus.NA
             ).count()
-            streak = (today - last_miss_date).days
+            streak = (yesterday - last_miss_date).days
             today_completion = self.completions.filter(date=today, habit=self).first()
             if (
                 today_completion
-                and today_completion.status == HabitCompletionStatus.INCOMPLETE
+                and today_completion.status == HabitCompletionStatus.COMPLETE
             ):
-                streak -= 1
+                # Add 1 for today's completion
+                streak += 1
             return streak - na_completions
         else:
             na_completions = self.completions.filter(
