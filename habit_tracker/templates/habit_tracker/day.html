@@ -3,6 +3,8 @@
 {% block content %}
   <h2>{{ view_date|date:"D, d M Y" }} {% if is_today %}(today){% endif %}</h2>
 
+  <p>{{ quote }}</p>
+
   <form method="post">
     {% csrf_token %}
     <table>

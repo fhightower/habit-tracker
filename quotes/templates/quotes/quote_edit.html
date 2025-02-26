@@ -1,0 +1,13 @@
+{% block content %}
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Changes</button>
+  </form>
+
+  <hr>
+
+  <form action="{% url 'quotes:quote_delete' object.id %}" method="get">
+    <button type="submit" style="color: red;">Delete Quote</button>
+  </form>
+{% endblock %}

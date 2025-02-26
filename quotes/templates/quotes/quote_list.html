@@ -1,0 +1,11 @@
+{% block content %}
+  <h1>Quote List</h1>
+
+  <ul>
+    {% for quote in quotes %}
+            <li><a href="{% url 'quotes:quote_edit' quote.id %}">{{ quote }}</a></li>
+    {% endfor %}
+  </ul>
+
+  <a href="{% url 'quotes:quote_create' %}">Create New Quote</a>
+{% endblock %}

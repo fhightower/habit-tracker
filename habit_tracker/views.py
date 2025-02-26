@@ -12,6 +12,7 @@ from django.views.generic import (
 from django.urls import reverse_lazy
 from django.shortcuts import redirect, render
 from habit_tracker.utils import get_habits_for_date
+from quotes.utils import get_quote_for_week
 from .models import Habit, HabitCompletion, HabitCompletionStatus
 from .forms import HabitCompletionForm
 
@@ -65,6 +66,7 @@ def day_view(request, year, month, day):
                     )
             return redirect("habit_tracker:day_view", year=year, month=month, day=day)
     else:
+        quote = get_quote_for_week()
         if view_date > today:
             return HttpResponseForbidden("Access to future dates is not allowed.")
 
@@ -81,6 +83,7 @@ def day_view(request, year, month, day):
         context = {
             "form": form,
             "view_date": view_date,
+            "quote": quote.quote,
             "completion_percent": round(_find_completion_percent(completions) * 100),
             "is_today": is_today,
         }
