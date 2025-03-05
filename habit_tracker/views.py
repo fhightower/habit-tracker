@@ -126,6 +126,10 @@ def _find_opacity(completion_percent: float) -> float:
 
 
 def heatmap_view(request):
+    # handle ?habit_id= query parameter
+    habit_id = request.GET.get("habit_id")
+    selected_habit_name = None
+
     today = timezone.now().date()
     date_to_process = today - timedelta(days=365)
     # Find the Sunday before the day 365 days ago
@@ -135,7 +139,12 @@ def heatmap_view(request):
     week_stats = []
 
     while date_to_process <= today:
-        completions = HabitCompletion.objects.filter(date=date_to_process)
+        query = {"date": date_to_process}
+        if habit_id:
+            query["habit_id"] = habit_id
+            selected_habit_name = Habit.objects.get(id=habit_id).name
+
+        completions = HabitCompletion.objects.filter(**query)
         completion_percent = _find_completion_percent(completions)
         day_heatmap_data = HeatmapData(
             date=date_to_process,
@@ -159,7 +168,13 @@ def heatmap_view(request):
         )
 
     return render(
-        request, "habit_tracker/heatmap.html", {"week_data": zip(weeks, week_stats)}
+        request,
+        "habit_tracker/heatmap.html",
+        {
+            "week_data": zip(weeks, week_stats),
+            "habits": Habit.objects.all().order_by("name"),
+            "selected_habit_name": selected_habit_name,
+        },
     )
 
 

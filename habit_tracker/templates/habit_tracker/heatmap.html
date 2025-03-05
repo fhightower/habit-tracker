@@ -21,6 +21,26 @@
     {% endfor %}
   </div>
 
+  <div class="filterButtons">
+    {% if selected_habit_name %}
+    <p>
+        <span>Filtering by: <b>{{ selected_habit_name }}</b></span>
+        <br>
+        <button>
+            <a href="{% url 'habit_tracker:heatmap' %}">Clear Filter</a>
+       </button>
+    </p>
+    {% endif %}
+    <details>
+        <summary>Filter by Habit</summary>
+        {% for habit in habits %}
+            <button>
+                <a href="{% url 'habit_tracker:heatmap' %}?habit_id={{ habit.id }}">{{ habit.name }}</a>
+            </button>
+        {% endfor %}
+    </details>
+  </div>
+
   <style>
     .heatmap {
       display: flex;
