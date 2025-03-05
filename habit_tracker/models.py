@@ -63,7 +63,7 @@ class Habit(models.Model):
                 status=HabitCompletionStatus.NA,
             ).count()
             streak = (yesterday - last_completion_date).days
-            return -(streak + na_completions)
+            return -(streak - na_completions)
 
     @property
     def completion_percentage(self) -> int:

@@ -1,10 +1,3 @@
-"""
-path("quotes/", views.QuotesListView.as_view(), name="quotes_list"),
-path("quotes/new/", views.QuoteCreateView.as_view(), name="quote_create"),
-path("quotes/<int:pk>/", views.QuoteEditView.as_view(), name="quote_edit"),
-
-"""
-
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
