@@ -6,7 +6,7 @@ from .models import WeeklyQuote
 
 
 def get_most_recent_weekly_quote() -> WeeklyQuote:
-    return WeeklyQuote.objects.order_by("last_used").first()
+    return WeeklyQuote.objects.order_by("-last_used").first()
 
 
 def get_random_weekly_quote() -> WeeklyQuote:

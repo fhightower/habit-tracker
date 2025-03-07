@@ -9,8 +9,11 @@
           <a href="{% url 'habit_tracker:day_view' day.date.year day.date.month day.date.day %}">
             <div
               class="day"
-              style="background-color: rgba(34, 139, 34, {{ day.opacity }});"
+              style="{% if day.is_na %}background-color: #999;{% else %}background-color: rgba(34, 139, 34, {{ day.opacity }});{% endif %}"
               title="Date: {{ day.date }} | Completions: {{ day.completion_percent_human_readable }}%">
+                {% if day.date == selected_habit_start_date %}
+                  &#9733;
+                {% endif %}
             </div>
           </a>
         {% endfor %}

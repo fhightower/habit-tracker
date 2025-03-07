@@ -96,6 +96,7 @@ class HeatmapData:
     completion_percent_float: float
     completion_percent_human_readable: int
     opacity: float
+    is_na: bool = False
 
 
 def _find_completion_percent(completions) -> float:
@@ -126,9 +127,16 @@ def _find_opacity(completion_percent: float) -> float:
 
 
 def heatmap_view(request):
-    # handle ?habit_id= query parameter
     habit_id = request.GET.get("habit_id")
     selected_habit_name = None
+    selected_habit_start_date = None
+    base_query = {}
+
+    if habit_id:
+        selected_habit = Habit.objects.get(id=habit_id)
+        selected_habit_name = selected_habit.name
+        selected_habit_start_date = selected_habit.start_date
+        base_query["habit_id"] = habit_id
 
     today = timezone.now().date()
     date_to_process = today - timedelta(days=365)
@@ -139,10 +147,8 @@ def heatmap_view(request):
     week_stats = []
 
     while date_to_process <= today:
-        query = {"date": date_to_process}
-        if habit_id:
-            query["habit_id"] = habit_id
-            selected_habit_name = Habit.objects.get(id=habit_id).name
+        query = base_query.copy()
+        query["date"] = date_to_process
 
         completions = HabitCompletion.objects.filter(**query)
         completion_percent = _find_completion_percent(completions)
@@ -152,6 +158,10 @@ def heatmap_view(request):
             completion_percent_human_readable=round(completion_percent * 100),
             opacity=_find_opacity(completion_percent),
         )
+
+        if habit_id and completions.count() and completions[0].status == HabitCompletionStatus.NA:
+            day_heatmap_data.is_na = True
+
         data.append(day_heatmap_data)
         date_to_process += timedelta(days=1)
 
@@ -174,6 +184,7 @@ def heatmap_view(request):
             "week_data": zip(weeks, week_stats),
             "habits": Habit.objects.all().order_by("name"),
             "selected_habit_name": selected_habit_name,
+            "selected_habit_start_date": selected_habit_start_date,
         },
     )
 
