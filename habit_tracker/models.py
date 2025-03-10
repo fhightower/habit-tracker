@@ -33,12 +33,6 @@ class Habit(models.Model):
             ).count()
             # We +1 b/c you may have gotten it on the start date
             streak = (today - self.start_date).days + 1 - na_completions
-            today_completion = self.completions.filter(date=today, habit=self).first()
-            if (
-                today_completion
-                and today_completion.status == HabitCompletionStatus.INCOMPLETE
-            ):
-                streak -= 1
             return streak
 
         last_miss_date = last_miss.date
@@ -46,23 +40,16 @@ class Habit(models.Model):
 
         if last_completion_date > last_miss_date:
             na_completions = self.completions.filter(
-                date__range=(last_miss_date, today), status=HabitCompletionStatus.NA
+                date__range=(last_miss_date, last_completion_date), status=HabitCompletionStatus.NA
             ).count()
-            streak = (yesterday - last_miss_date).days
-            today_completion = self.completions.filter(date=today, habit=self).first()
-            if (
-                today_completion
-                and today_completion.status == HabitCompletionStatus.COMPLETE
-            ):
-                # Add 1 for today's completion
-                streak += 1
+            streak = (last_completion_date - last_miss_date).days
             return streak - na_completions
         else:
             na_completions = self.completions.filter(
-                date__range=(last_completion_date, today),
+                date__range=(last_completion_date, last_miss_date),
                 status=HabitCompletionStatus.NA,
             ).count()
-            streak = (yesterday - last_completion_date).days
+            streak = (last_miss_date - last_completion_date).days
             return -(streak - na_completions)
 
     @property
