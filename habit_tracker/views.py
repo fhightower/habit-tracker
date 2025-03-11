@@ -126,17 +126,21 @@ def _find_opacity(completion_percent: float) -> float:
     return max(completion_percent * completion_percent, 0.1)
 
 
-def heatmap_view(request):
-    habit_id = request.GET.get("habit_id")
-    selected_habit_name = None
-    selected_habit_start_date = None
-    base_query = {}
-
+def _get_selected_habit_data(habit_id) -> dict:
+    data = {}
     if habit_id:
         selected_habit = Habit.objects.get(id=habit_id)
-        selected_habit_name = selected_habit.name
-        selected_habit_start_date = selected_habit.start_date
-        base_query["habit_id"] = habit_id
+        data["selected_habit_name"] = selected_habit.name
+        data["selected_habit_start_date"] = selected_habit.start_date
+        data["selected_habit_end_date"] = selected_habit.end_date
+    return data
+
+
+
+def heatmap_view(request):
+    habit_id = request.GET.get("habit_id")
+    selected_habit_data = _get_selected_habit_data(habit_id)
+    base_query = {"habit_id": habit_id} if habit_id else {}
 
     today = timezone.now().date()
     date_to_process = today - timedelta(days=365)
@@ -183,8 +187,7 @@ def heatmap_view(request):
         {
             "week_data": zip(weeks, week_stats),
             "habits": Habit.objects.all().order_by("name"),
-            "selected_habit_name": selected_habit_name,
-            "selected_habit_start_date": selected_habit_start_date,
+            **selected_habit_data,
         },
     )
 

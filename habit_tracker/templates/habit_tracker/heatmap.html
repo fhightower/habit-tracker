@@ -12,7 +12,9 @@
               style="{% if day.is_na %}background-color: #999;{% else %}background-color: rgba(34, 139, 34, {{ day.opacity }});{% endif %}"
               title="Date: {{ day.date }} | Completions: {{ day.completion_percent_human_readable }}%">
                 {% if day.date == selected_habit_start_date %}
-                  &#9733;
+                  &#x21D2;
+                {% elif day.date == selected_habit_end_date %}
+                  &#x21D0;
                 {% endif %}
             </div>
           </a>
