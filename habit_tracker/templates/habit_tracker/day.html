@@ -20,9 +20,20 @@
       {% endfor %}
     </table>
     <button type="submit">Save</button>
+
+    <p>{{ completion_percent }}% of habits completed today</p>
   </form>
 
-  <p>{{ completion_percent }}% of habits completed today</p>
+  <hr>
+
+  <details>
+      <summary>Bulk Actions</summary>
+
+      <p>Note that none of these actions will be saved until you click the "Save" button above.</p>
+      <button onclick="updateAllToNA()">Update all to N/A</button>
+  </details>
+
+  <hr>
 
   <style>
     .completed {
@@ -49,6 +60,13 @@
       } else if (select.value === 'INCOMPLETE') {
         select.classList.add('incomplete');
       }
+    }
+
+    function updateAllToNA() {
+      document.querySelectorAll('select').forEach((select) => {
+        select.value = 'N/A';
+        updateSelectStyles(select);
+      });
     }
 
     document.querySelectorAll('select').forEach((select) => {

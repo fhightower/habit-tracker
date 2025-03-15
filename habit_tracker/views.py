@@ -67,8 +67,6 @@ def day_view(request, year, month, day):
             return redirect("habit_tracker:day_view", year=year, month=month, day=day)
     else:
         quote = get_quote_for_week()
-        if view_date > today:
-            return HttpResponseForbidden("Access to future dates is not allowed.")
 
         initial_data = {}
         completions = HabitCompletion.objects.filter(date=view_date)
